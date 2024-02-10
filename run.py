@@ -2,10 +2,12 @@ import pygame as pg
 import obstacles
 import random
 import character
+import math
 
 # constants
 MAX_OBSTACLES = 2
-JUMP_SPEED_GAIN = 2
+SPEED = 2
+SQRT = math.sqrt(SPEED)
 ACCELERATION = 1e-3
 
 def main():
@@ -41,11 +43,24 @@ def main():
                 if event.key == pg.K_ESCAPE:
                     going = False
                     break
-                if event.key == pg.K_UP:
-                    angel.rect = angel.rect.move(angel.rect.x, angel.rect.y-1)
-                if event.key == pg.K_DOWN:
-                    angel.rect = angel.rect.move(angel.rect.x, angel.rect.y+1)
-        allsprites.update(speed=1+howfast, screen=screen)
+        pressed = pg.key.get_pressed()
+        def delta(x,y):
+            angel.rect.x += x
+            angel.rect.y += y
+        if pressed[pg.K_UP]:
+            if pressed[pg.K_LEFT]: delta(-SQRT,-SQRT)
+            elif pressed[pg.K_RIGHT]: delta(SQRT,-SQRT)
+            else: angel.rect.y -= SPEED
+        elif pressed[pg.K_DOWN]:
+            if pressed[pg.K_LEFT]: delta(-SQRT,SQRT)
+            elif pressed[pg.K_RIGHT]: delta(SQRT,SQRT)
+            else: angel.rect.y += SPEED
+        elif pressed[pg.K_LEFT]: angel.rect.x -= SPEED
+        elif pressed[pg.K_RIGHT]: angel.rect.x += SPEED
+        try:
+            allsprites.update(speed=1+howfast, screen=screen, collide=spriteobstacles)
+        except:
+            break
         # sprites might have been removed from the group
         if len(spriteobstacles) < MAX_OBSTACLES:
             sprite = obstacles.Obstacle(screen, rand_bool())
@@ -57,7 +72,7 @@ def main():
         background.blit(image, (0,0))
         screen.blit(background, (0,0))
         pg.display.flip()
-        #howfast += ACCELERATION
+        howfast += ACCELERATION
         score += 1/60
     if going:
         font = pg.font.Font(None, 64)

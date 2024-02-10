@@ -18,8 +18,10 @@ class Obstacle(pg.sprite.Sprite):
         self.rect.centerx = topright[0]
         if flipped:
             self.rect.centery = topright[1] + random.randrange(0,screen.get_rect().centery)
+            self.image = pg.transform.scale(self.image, (self.rect.width, self.rect.centery))
         else:
             self.rect.centery = screen.get_rect().bottomright[1] + random.randrange(0,screen.get_rect().centery)
+            self.image = pg.transform.scale(self.image, (self.rect.width, abs(screen.get_rect().bottom - self.rect.centery)))
     def update(self, *args: Any, **kwargs: Any):
         speed = kwargs.get('speed', 1)
         self.rect = self.rect.move(-speed,0)
