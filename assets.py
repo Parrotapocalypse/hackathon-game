@@ -1,6 +1,7 @@
 import pygame
 def load_image(name, rotation=0, scale=1):
     surface = pygame.image.load(name)
+    surface = surface.convert_alpha()
 
     surface = pygame.transform.rotate(surface, rotation)
     

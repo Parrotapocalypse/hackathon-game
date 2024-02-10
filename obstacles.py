@@ -8,5 +8,9 @@ class Obstacle(pg.sprite.Sprite):
         rotation = 0
         if flipped: rotation = 180
         self.image, self.rect = assets.load_image('images/fire.png', rotation)
-    def update(self, *args: Any, **kwargs: Any) -> None:
-        self.rect = self.rect.move(-1,0)
+        colorkey = self.image.get_at((0, 0))
+        self.image.set_colorkey(colorkey)
+    def update(self, *args: Any, **kwargs: Any):
+        speed = kwargs.get('speed', 1)
+        self.rect = self.rect.move(-speed,0)
+        if self.rect.topright[0] < kwargs.get('screen').get_rect().topleft[0]: self.kill()

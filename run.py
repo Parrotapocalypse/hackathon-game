@@ -1,5 +1,9 @@
 import pygame as pg
 import obstacles
+import random
+
+# constants
+MAX_OBSTACLES = 2
 
 def main():
     # set up main game stuff
@@ -11,16 +15,15 @@ def main():
     # set up background and display it
     background = pg.Surface(screen.get_size())
     background = background.convert()
-
-    #background.fill((170, 238, 187))
-    #screen.blit(background, (0, 0))
-
+    image = pg.Surface(background.get_size(), pg.SRCALPHA)
+    image.convert()
+    
     # set up sprites
     #angel = ...
     obstacle1 = obstacles.Obstacle()
     obstacle2 = obstacles.Obstacle(True)
-    allsprites = pg.sprite.RenderPlain(obstacle1) # we could add more sprites to this group later
-
+    allsprites = pg.sprite.RenderPlain((obstacle1, obstacle2)) # we could add more sprites to this group later
+    
     going = True # infinite game loop
     while going:
         clock.tick(60)
@@ -35,14 +38,21 @@ def main():
                     pass
             elif event.type == pg.MOUSEBUTTONDOWN:
                 pass
-        allsprites.update()
-        background.fill((200,100,50))
-
+        allsprites.update(speed=1, screen=screen)
+        # sprites might have been removed from the group
+        if len(allsprites) < MAX_OBSTACLES:
+            allsprites.add(obstacles.Obstacle(rand_bool()))
+        image.fill((200,100,50))
         # do the actual displaying of stuff
+        allsprites.draw(image)
+        background.blit(image, (0,0))
         screen.blit(background, (0, 0))
-        allsprites.draw(screen)
         pg.display.flip()
+        
     pg.quit()
+
+def rand_bool():
+    return random.randint(0,1) == 0
 
 if __name__ == '__main__':
     main()
