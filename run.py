@@ -5,7 +5,8 @@ import character
 
 # constants
 MAX_OBSTACLES = 2
-JUMP_SPEED_GAIN = -0.5
+JUMP_SPEED_GAIN = 2
+ACCELERATION = 1e-3
 
 def main():
     # set up main game stuff
@@ -28,17 +29,22 @@ def main():
     spriteobstacles = pg.sprite.RenderPlain((obstacle1, obstacle2))
     going = True # infinite game loop
     howfast = 0
+    score = 0
     while going:
         clock.tick(60)
         # check for interaction
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 going = False
+                break
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     going = False
-                elif event.key == pg.K_SPACE:
-                    angel.velocity += JUMP_SPEED_GAIN
+                    break
+                if event.key == pg.K_UP:
+                    angel.rect = angel.rect.move(angel.rect.x, angel.rect.y-1)
+                if event.key == pg.K_DOWN:
+                    angel.rect = angel.rect.move(angel.rect.x, angel.rect.y+1)
         allsprites.update(speed=1+howfast, screen=screen)
         # sprites might have been removed from the group
         if len(spriteobstacles) < MAX_OBSTACLES:
@@ -51,7 +57,14 @@ def main():
         background.blit(image, (0,0))
         screen.blit(background, (0,0))
         pg.display.flip()
-        howfast += 1e-2
+        #howfast += ACCELERATION
+        score += 1/60
+    if going:
+        font = pg.font.Font(None, 64)
+        text = font.render(f"Your Score: {score}", True, (10, 10, 10))
+        textpos = text.get_rect(centerx=background.get_width() / 2, y=10)
+        background.blit(text, textpos)
+        pg.display.flip()
     pg.quit()
 
 def rand_bool():
