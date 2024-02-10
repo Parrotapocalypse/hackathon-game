@@ -1,32 +1,48 @@
 import pygame as pg
+import obstacles
 
 def main():
+    # set up main game stuff
     pg.init()
     clock = pg.time.Clock()
     screen = pg.display.set_mode((1280, 480), pg.FULLSCREEN)
     pg.display.set_caption("Biblically Accurate Angel Simulator")
     pg.mouse.set_visible(True)
+    # set up background and display it
     background = pg.Surface(screen.get_size())
     background = background.convert()
-    background.fill((170, 238, 187))
-    screen.blit(background, (0, 0))
-    rgb = [0,0,0]
-    going = True
+
+    #background.fill((170, 238, 187))
+    #screen.blit(background, (0, 0))
+
+    # set up sprites
+    #angel = ...
+    obstacle1 = obstacles.Obstacle()
+    obstacle2 = obstacles.Obstacle(True)
+    allsprites = pg.sprite.RenderPlain(obstacle1) # we could add more sprites to this group later
+
+    going = True # infinite game loop
     while going:
         clock.tick(60)
-        rgb = updateRGB(rgb)
-        background.fill((rgb[0],rgb[1],rgb[2]))
-        screen.blit(background, (0, 0))
-        pg.display.flip()
+        # check for interaction
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                going = False
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    going = False
+                elif event.key == pg.K_SPACE:
+                    pass
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                pass
+        allsprites.update()
+        background.fill((200,100,50))
 
-def updateRGB(rgb):
-    newrgb = rgb[:]
-    for i,color in enumerate(rgb):
-        if color == 255: newrgb[i] = 0
-        else: newrgb[i] = color + 1
-        if newrgb[i] != 0: break
-    return newrgb
-    
+        # do the actual displaying of stuff
+        screen.blit(background, (0, 0))
+        allsprites.draw(screen)
+        pg.display.flip()
+    pg.quit()
 
 if __name__ == '__main__':
     main()
