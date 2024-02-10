@@ -1,9 +1,11 @@
 import pygame as pg
 import obstacles
 import random
+import character
 
 # constants
 MAX_OBSTACLES = 2
+JUMP_SPEED_GAIN = -0.5
 
 def main():
     # set up main game stuff
@@ -19,12 +21,13 @@ def main():
     image.convert()
     
     # set up sprites
-    #angel = ...
-    obstacle1 = obstacles.Obstacle()
-    obstacle2 = obstacles.Obstacle(True)
-    allsprites = pg.sprite.RenderPlain((obstacle1, obstacle2)) # we could add more sprites to this group later
-    
+    angel = character.Angel(screen)
+    obstacle1 = obstacles.Obstacle(screen)
+    obstacle2 = obstacles.Obstacle(screen, True)
+    allsprites = pg.sprite.RenderPlain((angel, obstacle1, obstacle2))
+    spriteobstacles = pg.sprite.RenderPlain((obstacle1, obstacle2))
     going = True # infinite game loop
+    howfast = 0
     while going:
         clock.tick(60)
         # check for interaction
@@ -35,20 +38,20 @@ def main():
                 if event.key == pg.K_ESCAPE:
                     going = False
                 elif event.key == pg.K_SPACE:
-                    pass
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                pass
-        allsprites.update(speed=1, screen=screen)
+                    angel.velocity += JUMP_SPEED_GAIN
+        allsprites.update(speed=1+howfast, screen=screen)
         # sprites might have been removed from the group
-        if len(allsprites) < MAX_OBSTACLES:
-            allsprites.add(obstacles.Obstacle(rand_bool()))
+        if len(spriteobstacles) < MAX_OBSTACLES:
+            sprite = obstacles.Obstacle(screen, rand_bool())
+            allsprites.add(sprite)
+            spriteobstacles.add(sprite)
         image.fill((200,100,50))
         # do the actual displaying of stuff
         allsprites.draw(image)
         background.blit(image, (0,0))
-        screen.blit(background, (0, 0))
+        screen.blit(background, (0,0))
         pg.display.flip()
-        
+        howfast += 1e-2
     pg.quit()
 
 def rand_bool():
